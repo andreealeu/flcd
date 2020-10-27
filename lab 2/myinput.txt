@@ -1,0 +1,11 @@
+unsigned int a b ;
+
+begin  
+    in(a)  
+    in(b)    
+    if a > b  
+        out(a)  
+    else  
+        out(b)   
+end 
+ 

@@ -1,0 +1,68 @@
+%{
+    #include "scanner.h"
+    #include "hash_table.h"  
+    #include "pif.h"
+%}
+
+
+%%
+begin return BEGIN_;
+end return END;
+
+in return IN;
+out return OUT;
+if return IF;
+else return ELSE;
+
+
+"(" return LEFT_PARANTHESIS;
+")" return RIGHT_PARANTHESIS;
+">" return GREATER;
+";" return SEMICOLON;
+
+"unsigned int" return TYPE_UNSIGNED_INT;
+[1-9][0-9]*  return CONSTANT_UNSIGNED_INT;
+[a-zA-Z][a-zA-Z_]*[0-9]*  return IDENTIFIER;
+
+%%
+
+
+ 
+int main( argc, argv )
+int argc;
+char **argv;
+    {
+        ++argv, --argc;	/* skip over program name */
+        if ( argc > 0 )
+            yyin = fopen( argv[0], "r" );
+        else
+            yyin = stdin;
+    
+        hash_table *ST = new_hash_table();
+        pif_table *PIF = new_pif_table();
+        
+        int token;
+        char *token_text;
+       
+        token= yylex();
+        while(token) {
+            if (token == IDENTIFIER){
+                token_text = malloc(yyleng);
+                strncpy(token_text, yytext, yyleng);
+                insert_pif(PIF, token,insert(token_text, ST)); 
+            }
+            else {
+                insert_pif(PIF, token, -1);
+            }    
+            token= yylex();
+        }
+
+        print_table(ST);
+        print_pif_table(PIF);
+
+        return 0;
+    }
+
+#ifndef yywrap
+   int yywrap() { return 1; }
+   #endif
